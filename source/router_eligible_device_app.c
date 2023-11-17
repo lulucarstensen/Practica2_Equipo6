@@ -79,12 +79,13 @@ Private macros
 #define APP_LED_URI_PATH                        "/led"
 #define APP_TEMP_URI_PATH                       "/temp"
 #define APP_SINK_URI_PATH                       "/sink"
-#define APP_TEAM6_URI_PATH                  "/team6"
+#define APP_TEAM6_URI_PATH                      "/team6"
 #if LARGE_NETWORK
 #define APP_RESET_TO_FACTORY_URI_PATH           "/reset"
 #endif
 
 #define APP_DEFAULT_DEST_ADDR                   in6addr_realmlocal_allthreadnodes
+#define gTimerCounterEvent    					15
 
 /*==================================================================================================
 Private type definitions
@@ -132,6 +133,58 @@ static void APP_SendResetToFactoryCommand(uint8_t *param);
 static void APP_AutoStart(void *param);
 static void APP_AutoStartCb(void *param);
 #endif
+
+static uint8_t gCounter = 0;
+
+
+void TimerTask(osaTaskParam_t argument);
+OSA_TASK_DEFINE(TimerTask, 4, 1, 700, FALSE);
+static tmrTimerID_t TimerCounter= gTmrInvalidTimerID_c;
+osaEventId_t          CounterEvent;
+osaTaskId_t			  TimerHandler;
+
+
+void TimerCounterTimeout()
+{
+	OSA_EventSet(CounterEvent, gTimerCounterEvent);
+}
+
+void TimerTaskInit(void)
+{
+	TimerCounter = TMR_AllocateTimer();
+	CounterEvent = OSA_EventCreate(TRUE);
+	TimerHandler = OSA_TaskCreate(OSA_TASK(TimerTask), NULL);
+}
+
+//Start Timer for LED//
+void StartTimerCounter()
+{
+    /* start the timer */
+    if(!TMR_IsTimerActive(TimerCounter))
+    {
+      TMR_StartIntervalTimer(TimerCounter, 1000, (pfTmrCallBack_t)TimerCounterTimeout, (void*)((uint32_t)TimerCounter));
+    }
+}
+
+void TimerTask(osaTaskParam_t argument)
+{
+	osaEventFlags_t ev;
+	StartTimerCounter();
+	while(1)
+	{
+		OSA_EventWait(CounterEvent, osaEventFlagsAll_c, FALSE, osaWaitForever_c, &ev);
+
+		if(ev == gTimerCounterEvent)
+		{
+			if(gCounter == 200)
+				gCounter = 0;
+			else
+				gCounter++;
+		}
+
+	}
+
+}
 
 /*==================================================================================================
 Public global variables declarations
@@ -429,6 +482,7 @@ void APP_Commissioning_Handler
             App_UpdateStateLeds(gDeviceState_FactoryDefault_c);
             break;
         case gThrEv_MeshCop_JoinerAccepted_c:
+        	TimerTaskInit();
             break;
 
         /* Commissioner Events(event set applies for all Commissioners: on-mesh, external, native) */
