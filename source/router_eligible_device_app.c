@@ -134,16 +134,13 @@ static void APP_AutoStart(void *param);
 static void APP_AutoStartCb(void *param);
 #endif
 
-static uint8_t gCounter = 0;
-
-
 void TimerTask(osaTaskParam_t argument);
 OSA_TASK_DEFINE(TimerTask, 4, 1, 700, FALSE);
 static tmrTimerID_t TimerCounter= gTmrInvalidTimerID_c;
 osaEventId_t          CounterEvent;
 osaTaskId_t			  TimerHandler;
 
-
+void TimerTask(osaTaskParam_t argument);
 void TimerCounterTimeout()
 {
 	OSA_EventSet(CounterEvent, gTimerCounterEvent);
@@ -162,29 +159,10 @@ void StartTimerCounter()
     /* start the timer */
     if(!TMR_IsTimerActive(TimerCounter))
     {
-      TMR_StartIntervalTimer(TimerCounter, 1000, (pfTmrCallBack_t)TimerCounterTimeout, (void*)((uint32_t)TimerCounter));
+      TMR_StartIntervalTimer(TimerCounter, 5000, (pfTmrCallBack_t)TimerCounterTimeout, (void*)((uint32_t)TimerCounter));
     }
 }
 
-void TimerTask(osaTaskParam_t argument)
-{
-	osaEventFlags_t ev;
-	StartTimerCounter();
-	while(1)
-	{
-		OSA_EventWait(CounterEvent, osaEventFlagsAll_c, FALSE, osaWaitForever_c, &ev);
-
-		if(ev == gTimerCounterEvent)
-		{
-			if(gCounter == 200)
-				gCounter = 0;
-			else
-				gCounter++;
-		}
-
-	}
-
-}
 
 
 
@@ -484,7 +462,6 @@ void APP_Commissioning_Handler
             App_UpdateStateLeds(gDeviceState_FactoryDefault_c);
             break;
         case gThrEv_MeshCop_JoinerAccepted_c:
-        	TimerTaskInit();
             break;
 
         /* Commissioner Events(event set applies for all Commissioners: on-mesh, external, native) */
@@ -497,6 +474,7 @@ void APP_Commissioning_Handler
 
             MESHCOP_AddExpectedJoiner(mThrInstanceId, aDefaultEui, defaultPskD.aStr, defaultPskD.length, TRUE);
             MESHCOP_SyncSteeringData(mThrInstanceId, gMeshcopEuiMaskAllFFs_c);
+        	TimerTaskInit();
             break;
         }
         case gThrEv_MeshCop_CommissionerPetitionRejected_c:
@@ -1548,7 +1526,7 @@ static void APP_AutoStartCb
 static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coapSession_t *pSession, uint32_t dataLen)
 {
 	static uint8_t *pMySessionPayload = &gCounter;
-	static uint32_t pMyPayloadSize = sizeof(gCounter);
+	static uint32_t pMyPayloadSize = sizeof();
 	coapSession_t *pMySession = NULL;
 	pMySession = COAP_OpenSession(mAppCoapInstId);
 	COAP_AddOptionToList(pMySession,COAP_URI_PATH_OPTION, APP_TEAM6_URI_PATH, SizeOfString(APP_TEAM6_URI_PATH));
@@ -1604,17 +1582,6 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 
 	shell_writeN(pData, dataLen);
 	shell_write("\r\n");
-	pMySession -> autoClose = FALSE;
-	pMySession -> msgType=gCoapNonConfirmable_c;
-	pMySession -> code= gCoapPOST_c;
-	pMySession -> pCallback =NULL;
-	FLib_MemCpy(&pMySession->remoteAddrStorage,&gCoapDestAddress,sizeof(ipAddr_t));
-
-	COAP_Send(pMySession, gCoapNonConfirmable_c,  pMySessionPayload, pMyPayloadSize);
-	shell_write("'NON' packet sent 'POST' with payload: ");
-	shell_writeN((char*) pMySessionPayload, pMyPayloadSize);
-	shell_write("\r\n");
-
 	COAP_CloseSession(pMySession);
 
 }
@@ -1622,3 +1589,36 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 /*==================================================================================================
 Private debug functions
 ==================================================================================================*/
+void TimerTask(osaTaskParam_t argument)
+{
+	static uint8_t pMySessionPayload[4]={'g','i','v','e'};
+	static uint32_t pMyPayloadSize = 4;
+	coapSession_t *pMySession = NULL;
+	COAP_AddOptionToList(pMySession,COAP_URI_PATH_OPTION, APP_TEAM6_URI_PATH, SizeOfString(APP_TEAM6_URI_PATH));
+	osaEventFlags_t ev;
+	StartTimerCounter();
+	while(1)
+	{
+		OSA_EventWait(CounterEvent, osaEventFlagsAll_c, FALSE, osaWaitForever_c, &ev);
+
+		if(ev == gTimerCounterEvent)
+		{
+			pMySession = COAP_OpenSession(mAppCoapInstId);
+
+			pMySession -> autoClose = FALSE;
+			pMySession -> msgType=gCoapNonConfirmable_c;
+			pMySession -> code= gCoapGET_c;
+			pMySession -> pCallback =NULL;
+			FLib_MemCpy(&pMySession->remoteAddrStorage,&gCoapDestAddress,sizeof(ipAddr_t));
+
+			COAP_Send(pMySession, pMySession -> msgType,  pMySessionPayload, pMyPayloadSize);
+			shell_write("'NON' packet sent 'POST' with payload: ");
+			shell_writeN((char*) pMySessionPayload, pMyPayloadSize);
+			shell_write("\r\n");
+			COAP_CloseSession(pMySession);
+
+		}
+
+	}
+
+}
