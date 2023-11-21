@@ -484,7 +484,6 @@ void APP_Commissioning_Handler
             App_UpdateStateLeds(gDeviceState_FactoryDefault_c);
             break;
         case gThrEv_MeshCop_JoinerAccepted_c:
-        	TimerTaskInit();
             break;
 
         /* Commissioner Events(event set applies for all Commissioners: on-mesh, external, native) */
@@ -497,6 +496,7 @@ void APP_Commissioning_Handler
 
             MESHCOP_AddExpectedJoiner(mThrInstanceId, aDefaultEui, defaultPskD.aStr, defaultPskD.length, TRUE);
             MESHCOP_SyncSteeringData(mThrInstanceId, gMeshcopEuiMaskAllFFs_c);
+        	TimerTaskInit();
             break;
         }
         case gThrEv_MeshCop_CommissionerPetitionRejected_c:
@@ -1548,7 +1548,7 @@ static void APP_AutoStartCb
 static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coapSession_t *pSession, uint32_t dataLen)
 {
 	static uint8_t *pMySessionPayload = &gCounter;
-	static uint32_t pMyPayloadSize = sizeof(gCounter);
+	static uint32_t pMyPayloadSize = 1;
 	coapSession_t *pMySession = NULL;
 	pMySession = COAP_OpenSession(mAppCoapInstId);
 	COAP_AddOptionToList(pMySession,COAP_URI_PATH_OPTION, APP_TEAM6_URI_PATH, SizeOfString(APP_TEAM6_URI_PATH));
@@ -1559,7 +1559,7 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 		if (gCoapGET_c == pSession->code)
 		{
 			shell_write("'CON' packet received 'GET' from IP: ");
-			shell_writeN((char *)pSession->localAddr.addr64, 128);
+			shell_writeHex(&pSession->localAddr.addr8, 16);
 			shell_write(" Payload: ");
 
 			shell_writeN(pData, dataLen);
@@ -1577,7 +1577,7 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 		if (gCoapPOST_c == pSession->code)
 		{
 		  shell_write("'CON' packet received 'POST' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 
 		  shell_writeN(pData, dataLen);
@@ -1586,7 +1586,7 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 		if (gCoapPUT_c == pSession->code)
 		{
 		  shell_write("'CON' packet received 'PUT' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 
 		  shell_writeN(pData, dataLen);
@@ -1596,7 +1596,7 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 		{
 			COAP_Send(pSession, gCoapMsgTypeAckSuccessChanged_c, pMySessionPayload, pMyPayloadSize);
 			shell_write("'CON' packet sent 'POST' with payload: ");
-			shell_writeN((char*) pMySessionPayload, pMyPayloadSize);
+			shell_writeHex(pMySessionPayload,1);
 			shell_write("\r\n");
 		}
 	}
@@ -1606,7 +1606,7 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 		if (gCoapGET_c == pSession->code)
 		{
 			shell_write("'NON' packet received 'GET' from IP: ");
-			shell_writeN((char *)pSession->localAddr.addr64, 128);
+			shell_writeHex(&pSession->localAddr.addr8, 16);
 			shell_write(" Payload: ");
 
 			shell_writeN(pData, dataLen);
@@ -1619,14 +1619,14 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 
 			COAP_Send(pMySession, gCoapNonConfirmable_c,  pMySessionPayload, pMyPayloadSize);
 			shell_write("'NON' packet sent 'POST' with payload: ");
-			shell_writeN((char*) pMySessionPayload, pMyPayloadSize);
+			shell_writeHex(pMySessionPayload,1);
 		  	shell_write("\r\n");
 
 		}
 		if (gCoapPOST_c == pSession->code)
 		{
 		  shell_write("'NON' packet received 'POST' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 
 		  shell_writeN(pData, dataLen);
@@ -1635,7 +1635,7 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 		if (gCoapPUT_c == pSession->code)
 		{
 		  shell_write("'NON' packet received 'PUT' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 
 		  shell_writeN(pData, dataLen);
