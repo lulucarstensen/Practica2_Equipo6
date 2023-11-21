@@ -140,7 +140,6 @@ static tmrTimerID_t TimerCounter= gTmrInvalidTimerID_c;
 osaEventId_t          CounterEvent;
 osaTaskId_t			  TimerHandler;
 
-void TimerTask(osaTaskParam_t argument);
 void TimerCounterTimeout()
 {
 	OSA_EventSet(CounterEvent, gTimerCounterEvent);
@@ -456,10 +455,12 @@ void APP_Commissioning_Handler
             break;
         case gThrEv_MeshCop_JoinerDtlsSessionStarted_c:
             App_UpdateStateLeds(gDeviceState_JoiningOrAttaching_c);
+            TimerTaskInit();
             break;
         case gThrEv_MeshCop_JoinerDtlsError_c:
         case gThrEv_MeshCop_JoinerError_c:
             App_UpdateStateLeds(gDeviceState_FactoryDefault_c);
+
             break;
         case gThrEv_MeshCop_JoinerAccepted_c:
             break;
@@ -474,7 +475,6 @@ void APP_Commissioning_Handler
 
             MESHCOP_AddExpectedJoiner(mThrInstanceId, aDefaultEui, defaultPskD.aStr, defaultPskD.length, TRUE);
             MESHCOP_SyncSteeringData(mThrInstanceId, gMeshcopEuiMaskAllFFs_c);
-        	TimerTaskInit();
             break;
         }
         case gThrEv_MeshCop_CommissionerPetitionRejected_c:
@@ -850,6 +850,7 @@ static void APP_JoinEventsHandler
         else if(evCode == gThrEv_NwkJoinCnf_Success_c)
         {
             mJoiningIsAppInitiated = FALSE;
+
         }
     }
 }
@@ -1523,7 +1524,7 @@ static void APP_AutoStartCb
 #endif
 
 
-static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coapSession_t *pSession, uint32_t dataLen)
+static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData, coapSession_t *pSession, uint32_t dataLen)
 {
 	static uint8_t pMySessionPayload[4]={'g','o','o','d'};
 	static uint32_t pMyPayloadSize = 4;
@@ -1536,20 +1537,20 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 		if (gCoapGET_c == pSession->code)
 		{
 		  shell_write("'CON' packet received 'GET' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 
 		}
 		if (gCoapPOST_c == pSession->code)
 		{
 		  shell_write("'CON' packet received 'POST' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 		}
 		if (gCoapPUT_c == pSession->code)
 		{
 		  shell_write("'CON' packet received 'PUT' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 		}
 		if (gCoapFailure_c!=sessionStatus)
@@ -1563,24 +1564,24 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 		if (gCoapGET_c == pSession->code)
 		{
 		  shell_write("'NON' packet received 'GET' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 		}
 		if (gCoapPOST_c == pSession->code)
 		{
 		  shell_write("'NON' packet received 'POST' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 		}
 		if (gCoapPUT_c == pSession->code)
 		{
 		  shell_write("'NON' packet received 'PUT' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 		}
 	}
 
-	shell_writeN(pData, dataLen);
+	shell_writeHex(pData, dataLen);
 	shell_write("\r\n");
 	COAP_CloseSession(pMySession);
 
@@ -1594,7 +1595,6 @@ void TimerTask(osaTaskParam_t argument)
 	static uint8_t pMySessionPayload[4]={'g','i','v','e'};
 	static uint32_t pMyPayloadSize = 4;
 	coapSession_t *pMySession = NULL;
-	COAP_AddOptionToList(pMySession,COAP_URI_PATH_OPTION, APP_TEAM6_URI_PATH, SizeOfString(APP_TEAM6_URI_PATH));
 	osaEventFlags_t ev;
 	StartTimerCounter();
 	while(1)
@@ -1604,15 +1604,16 @@ void TimerTask(osaTaskParam_t argument)
 		if(ev == gTimerCounterEvent)
 		{
 			pMySession = COAP_OpenSession(mAppCoapInstId);
+			COAP_AddOptionToList(pMySession,COAP_URI_PATH_OPTION, APP_TEAM6_URI_PATH, SizeOfString(APP_TEAM6_URI_PATH));
 
 			pMySession -> autoClose = FALSE;
-			pMySession -> msgType=gCoapNonConfirmable_c;
+			pMySession -> msgType=gCoapConfirmable_c;
 			pMySession -> code= gCoapGET_c;
 			pMySession -> pCallback =NULL;
 			FLib_MemCpy(&pMySession->remoteAddrStorage,&gCoapDestAddress,sizeof(ipAddr_t));
 
 			COAP_Send(pMySession, pMySession -> msgType,  pMySessionPayload, pMyPayloadSize);
-			shell_write("'NON' packet sent 'POST' with payload: ");
+			shell_write("'NON' packet sent 'GET' with payload: ");
 			shell_writeN((char*) pMySessionPayload, pMyPayloadSize);
 			shell_write("\r\n");
 			COAP_CloseSession(pMySession);
