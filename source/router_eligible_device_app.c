@@ -1525,8 +1525,8 @@ static void APP_AutoStartCb
 
 static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coapSession_t *pSession, uint32_t dataLen)
 {
-	static uint8_t *pMySessionPayload = &gCounter;
-	static uint32_t pMyPayloadSize = sizeof();
+	static uint8_t pMySessionPayload[4]={'g','o','o','d'};
+	static uint32_t pMyPayloadSize = 4;
 	coapSession_t *pMySession = NULL;
 	pMySession = COAP_OpenSession(mAppCoapInstId);
 	COAP_AddOptionToList(pMySession,COAP_URI_PATH_OPTION, APP_TEAM6_URI_PATH, SizeOfString(APP_TEAM6_URI_PATH));
