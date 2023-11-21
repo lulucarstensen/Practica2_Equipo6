@@ -1552,14 +1552,26 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 	coapSession_t *pMySession = NULL;
 	pMySession = COAP_OpenSession(mAppCoapInstId);
 	COAP_AddOptionToList(pMySession,COAP_URI_PATH_OPTION, APP_TEAM6_URI_PATH, SizeOfString(APP_TEAM6_URI_PATH));
+	pMySession -> autoClose = FALSE;
 
 	if (gCoapConfirmable_c == pSession->msgType)
 	{
 		if (gCoapGET_c == pSession->code)
 		{
-		  shell_write("'CON' packet received 'GET' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
-		  shell_write(" Payload: ");
+			shell_write("'CON' packet received 'GET' from IP: ");
+			shell_writeN((char *)pSession->localAddr.addr64, 128);
+			shell_write(" Payload: ");
+
+			shell_writeN(pData, dataLen);
+
+			shell_write("\r\n");
+//			pMySession -> msgType=gCoapNonConfirmable_c;
+			pMySession -> code= gCoapPOST_c;
+			pMySession -> pCallback =NULL;
+			FLib_MemCpy(&pMySession->remoteAddrStorage,&gCoapDestAddress,sizeof(ipAddr_t));
+
+//			COAP_Send(pMySession, gCoapNonConfirmable_c,  pMySessionPayload, pMyPayloadSize);
+
 
 		}
 		if (gCoapPOST_c == pSession->code)
@@ -1567,16 +1579,25 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 		  shell_write("'CON' packet received 'POST' from IP: ");
 		  shell_writeN((char *)pSession->localAddr.addr64, 128);
 		  shell_write(" Payload: ");
+
+		  shell_writeN(pData, dataLen);
+
 		}
 		if (gCoapPUT_c == pSession->code)
 		{
 		  shell_write("'CON' packet received 'PUT' from IP: ");
 		  shell_writeN((char *)pSession->localAddr.addr64, 128);
 		  shell_write(" Payload: ");
+
+		  shell_writeN(pData, dataLen);
+
 		}
 		if (gCoapFailure_c!=sessionStatus)
 		{
-		  COAP_Send(pSession, gCoapMsgTypeAckSuccessChanged_c, pMySessionPayload, pMyPayloadSize);
+			COAP_Send(pSession, gCoapMsgTypeAckSuccessChanged_c, pMySessionPayload, pMyPayloadSize);
+			shell_write("'CON' packet sent 'POST' with payload: ");
+			shell_writeN((char*) pMySessionPayload, pMyPayloadSize);
+			shell_write("\r\n");
 		}
 	}
 
@@ -1584,36 +1605,43 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 	{
 		if (gCoapGET_c == pSession->code)
 		{
-		  shell_write("'NON' packet received 'GET' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
-		  shell_write(" Payload: ");
+			shell_write("'NON' packet received 'GET' from IP: ");
+			shell_writeN((char *)pSession->localAddr.addr64, 128);
+			shell_write(" Payload: ");
+
+			shell_writeN(pData, dataLen);
+
+			shell_write("\r\n");
+			pMySession -> msgType=gCoapNonConfirmable_c;
+			pMySession -> code= gCoapPOST_c;
+			pMySession -> pCallback =NULL;
+			FLib_MemCpy(&pMySession->remoteAddrStorage,&gCoapDestAddress,sizeof(ipAddr_t));
+
+			COAP_Send(pMySession, gCoapNonConfirmable_c,  pMySessionPayload, pMyPayloadSize);
+			shell_write("'NON' packet sent 'POST' with payload: ");
+			shell_writeN((char*) pMySessionPayload, pMyPayloadSize);
+		  	shell_write("\r\n");
+
 		}
 		if (gCoapPOST_c == pSession->code)
 		{
 		  shell_write("'NON' packet received 'POST' from IP: ");
 		  shell_writeN((char *)pSession->localAddr.addr64, 128);
 		  shell_write(" Payload: ");
+
+		  shell_writeN(pData, dataLen);
+
 		}
 		if (gCoapPUT_c == pSession->code)
 		{
 		  shell_write("'NON' packet received 'PUT' from IP: ");
 		  shell_writeN((char *)pSession->localAddr.addr64, 128);
 		  shell_write(" Payload: ");
+
+		  shell_writeN(pData, dataLen);
+
 		}
 	}
-
-	shell_writeN(pData, dataLen);
-	shell_write("\r\n");
-	pMySession -> autoClose = FALSE;
-	pMySession -> msgType=gCoapNonConfirmable_c;
-	pMySession -> code= gCoapPOST_c;
-	pMySession -> pCallback =NULL;
-	FLib_MemCpy(&pMySession->remoteAddrStorage,&gCoapDestAddress,sizeof(ipAddr_t));
-
-	COAP_Send(pMySession, gCoapNonConfirmable_c,  pMySessionPayload, pMyPayloadSize);
-	shell_write("'NON' packet sent 'POST' with payload: ");
-	shell_writeN((char*) pMySessionPayload, pMyPayloadSize);
-	shell_write("\r\n");
 
 	COAP_CloseSession(pMySession);
 
