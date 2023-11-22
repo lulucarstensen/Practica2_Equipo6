@@ -142,13 +142,13 @@ Public macros
 /*! The PAN identifier.
    If this value is 0xFFFF a random PAN ID will be generated on network creation */
 #ifndef THR_PAN_ID
-    #define THR_PAN_ID                                  THR_ALL_FFs16
+    #define THR_PAN_ID                                  0x6666
 #endif
 
 /*! The extended Pan ID.
    If this is set to all FFs, a random extended PAN ID will be generated on network creation  */
 #ifndef THR_EXTENDED_PAN_ID
-    #define THR_EXTENDED_PAN_ID                         {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF}
+    #define THR_EXTENDED_PAN_ID                         {0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66, 0x66}
 #endif
 
 /*! Node Addresses - if TRUE, unique device ID is USED, otherwise will have THR_EXT_ADDR */

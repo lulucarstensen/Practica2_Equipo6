@@ -76,7 +76,7 @@ void BOARD_InitSPI(void);
  *
  */
 void BOARD_InitLPUART(void);
-
+void BOARD_I2C_ConfigurePins(void);
 
 /*!
  * @brief Configures pin routing and optionally pin electrical features.

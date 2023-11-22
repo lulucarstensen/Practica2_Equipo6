@@ -24,7 +24,7 @@
 ../nwk_ip/base/shell/shell_ip.c:4570:13:PING_RetransmitCallback	8	static
 ../nwk_ip/base/shell/shell_ip.c:4646:13:PING_SendPing	16	static
 ../nwk_ip/base/shell/shell_ip.c:3663:23:SHELL_SearchInterfaceByName	24	static
-../nwk_ip/base/shell/shell_ip.c:4271:21:PING_CreatePktInfo	24	static
+../nwk_ip/base/shell/shell_ip.c:4271:21:PING_CreatePktInfo	32	static
 ../nwk_ip/base/shell/shell_ip.c:4064:15:SHELL_Ping	24	static
 ../nwk_ip/base/shell/shell_ip.c:4490:13:PING_HandleTimerCallback	16	static
 ../nwk_ip/base/shell/shell_ip.c:4586:13:PING_RetransmitHandle	16	static

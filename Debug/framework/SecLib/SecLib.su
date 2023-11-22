@@ -1,4 +1,4 @@
-../framework/SecLib/SecLib.c:1330:13:SecLib_LeftShiftOneBit	16	static
+../framework/SecLib/SecLib.c:1330:13:SecLib_LeftShiftOneBit	12	static
 ../framework/SecLib/SecLib.c:1358:13:SecLib_Padding	12	static
 ../framework/SecLib/SecLib.c:1388:13:SecLib_Xor128	12	static
 ../framework/SecLib/SecLib.c:191:6:SecLib_Init	8	static

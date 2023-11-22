@@ -1,4 +1,4 @@
-../nwk_ip/app/common/app_thread_callbacks.c:521:33:APP_GetNwkScanResultEntry	12	static
+../nwk_ip/app/common/app_thread_callbacks.c:521:33:APP_GetNwkScanResultEntry	8	static
 ../nwk_ip/app/common/app_thread_callbacks.c:607:16:APP_NwkCreateSelectBestChannel	32	static
 ../nwk_ip/app/common/app_thread_callbacks.c:1182:13:APP_InitializeNwkJoiningList	8	static
 ../nwk_ip/app/common/app_thread_callbacks.c:1155:13:APP_UpdateJoinerEntry	16	static

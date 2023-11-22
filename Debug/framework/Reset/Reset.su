@@ -1,1 +1,2 @@
-../framework/Reset/Reset.c:39:6:ResetMCU	0	static
+C:\Users\Alexis\Documents\MCUXpressoIDE_11.8.0_1165\GIT\Practica2_Equipo6\CMSIS/core_cm0plus.h:846:22:NVIC_SystemReset	0	static
+../framework/Reset/Reset.c:39:6:ResetMCU	8	static

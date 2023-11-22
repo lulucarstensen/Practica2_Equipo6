@@ -3,7 +3,7 @@
 ../drivers/fsl_tpm.c:121:6:TPM_Deinit	8	static
 ../drivers/fsl_tpm.c:131:6:TPM_GetDefaultConfig	8	static
 ../drivers/fsl_tpm.c:160:10:TPM_SetupPwm	48	static
-../drivers/fsl_tpm.c:364:6:TPM_UpdatePwmDutycycle	24	static
+../drivers/fsl_tpm.c:364:6:TPM_UpdatePwmDutycycle	16	static
 ../drivers/fsl_tpm.c:414:6:TPM_UpdateChnlEdgeLevelSelect	16	static
 ../drivers/fsl_tpm.c:444:6:TPM_SetupInputCapture	16	static
 ../drivers/fsl_tpm.c:489:6:TPM_SetupOutputCompare	16	static

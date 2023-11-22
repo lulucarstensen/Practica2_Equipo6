@@ -8,7 +8,7 @@
 ../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:431:6:PhyPpSetPromiscuous	0	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:462:6:PhySetActivePromiscuous	0	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:490:8:PhyGetActivePromiscuous	0	static
-../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:504:6:PhyPpSetSAMState	8	static
+../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:504:6:PhyPpSetSAMState	0	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:527:13:PhyPp_IndirectQueueInsert	8	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:564:13:PhyPp_RemoveFromIndirect	0	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:592:8:PhyPpIsPollIndication	0	static
@@ -29,7 +29,7 @@
 ../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:872:6:PhyPpSetDualPanDwell	0	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:887:9:PhyPpGetDualPanDwell	0	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:901:9:PhyPpGetDualPanRemain	0	static
-../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:915:6:PhyPpSetDualPanActiveNwk	8	static
+../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:915:6:PhyPpSetDualPanActiveNwk	0	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:930:9:PhyPpGetDualPanActiveNwk	0	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:945:9:PhyPpGetPanOfRxPacket	0	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyPacketProcessor.c:983:9:PhyPpGetDualPanSamLvl	0	static

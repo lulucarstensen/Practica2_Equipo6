@@ -36,7 +36,7 @@
 ../framework/NVM/Source/NV_Flash.c:1286:10:GetFlashTableVersion	8	static
 ../framework/NVM/Source/NV_Flash.c:1380:14:RecoverNvEntry	0	static
 ../framework/NVM/Source/NV_Flash.c:2040:8:__NvIsDataSetDirty	24	static
-../framework/NVM/Source/NV_Flash.c:2710:8:NvIsRecordErased	24	static
+../framework/NVM/Source/NV_Flash.c:2710:8:NvIsRecordErased	32	static
 ../framework/NVM/Source/NV_Flash.c:4116:21:NvCopyPage	88	static
 ../framework/NVM/Source/NV_Flash.c:2458:21:__NvModuleInit	16	static
 ../framework/NVM/Source/NV_Flash.c:5482:13:NvProcessFirstSaveInQueue	16	static
@@ -47,7 +47,7 @@
 ../framework/NVM/Source/NV_Flash.c:2403:21:__NvSaveOnIdle	16	static
 ../framework/NVM/Source/NV_Flash.c:2274:21:__NvSaveOnCount	16	static
 ../framework/NVM/Source/NV_Flash.c:2186:15:__NvTimerTick	32	static
-../framework/NVM/Source/NV_Flash.c:1922:13:__NvIdle	32	static
+../framework/NVM/Source/NV_Flash.c:1922:13:__NvIdle	24	static
 ../framework/NVM/Source/NV_Flash.c:5715:13:__NvCompletePendingOperations	8	static
 ../framework/NVM/Source/NV_Flash.c:5910:14:NvModuleInit	8	static
 ../framework/NVM/Source/NV_Flash.c:5951:14:NvMoveToRam	16	static

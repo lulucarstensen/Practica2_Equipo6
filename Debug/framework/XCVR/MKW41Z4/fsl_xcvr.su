@@ -22,7 +22,7 @@
 ../framework/XCVR/MKW41Z4/fsl_xcvr.c:1510:6:XCVR_ForceRxWu	0	static
 ../framework/XCVR/MKW41Z4/fsl_xcvr.c:1515:6:XCVR_ForceRxWd	0	static
 ../framework/XCVR/MKW41Z4/fsl_xcvr.c:502:14:XCVR_Configure	40	static
-../framework/XCVR/MKW41Z4/fsl_xcvr.c:308:14:XCVR_Init	64	static
+../framework/XCVR/MKW41Z4/fsl_xcvr.c:308:14:XCVR_Init	72	static
 ../framework/XCVR/MKW41Z4/fsl_xcvr.c:1104:14:XCVR_ChangeMode	40	static
 ../framework/XCVR/MKW41Z4/fsl_xcvr.c:1520:6:XCVR_ForceTxWu	0	static
 ../framework/XCVR/MKW41Z4/fsl_xcvr.c:1525:6:XCVR_ForceTxWd	0	static

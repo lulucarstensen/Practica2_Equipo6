@@ -1,6 +1,6 @@
 ../drivers/fsl_rtc.c:75:13:RTC_CheckDatetimeFormat	32	static
 ../drivers/fsl_rtc.c:107:17:RTC_ConvertDatetimeToSeconds	48	static
-../drivers/fsl_rtc.c:137:13:RTC_ConvertSecondsToDatetime	32	static
+../drivers/fsl_rtc.c:137:13:RTC_ConvertSecondsToDatetime	40	static
 ../drivers/fsl_rtc.c:208:6:RTC_Init	16	static
 ../drivers/fsl_rtc.c:239:6:RTC_GetDefaultConfig	8	static
 ../drivers/fsl_rtc.c:255:10:RTC_SetDatetime	16	static

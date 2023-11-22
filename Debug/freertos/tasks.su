@@ -27,7 +27,7 @@
 ../freertos/tasks.c:1231:7:vTaskDelay	8	static
 ../freertos/tasks.c:3372:13:prvCheckTasksWaitingTermination	8	static
 ../freertos/tasks.c:3138:8:prvIdleTask	8	static
-../freertos/tasks.c:2768:6:vTaskSwitchContext	12	static
+../freertos/tasks.c:2768:6:vTaskSwitchContext	8	static
 ../freertos/tasks.c:1573:7:vTaskSuspend	16	static
 ../freertos/tasks.c:2827:6:vTaskPlaceOnEventList	8	static
 ../freertos/tasks.c:2844:6:vTaskPlaceOnUnorderedEventList	16	static

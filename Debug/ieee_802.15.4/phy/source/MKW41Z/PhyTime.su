@@ -12,7 +12,7 @@
 ../ieee_802.15.4/phy/source/MKW41Z/PhyTime.c:314:6:PhyTimeSetWakeUpTime	8	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyTime.c:346:8:PhyTimeIsWakeUpTimeExpired	8	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyTime.c:407:17:PhyTime_TimerInit	8	static
-../ieee_802.15.4/phy/source/MKW41Z/PhyTime.c:437:11:PhyTime_GetTimestamp	16	static
+../ieee_802.15.4/phy/source/MKW41Z/PhyTime.c:437:11:PhyTime_GetTimestamp	24	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyTime.c:519:17:PhyTime_CancelEvent	8	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyTime.c:557:17:PhyTime_CancelEventsWithParam	16	static
 ../ieee_802.15.4/phy/source/MKW41Z/PhyTime.c:591:6:PhyTime_RunCallback	16	static

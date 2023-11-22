@@ -21,7 +21,7 @@
 ../drivers/fsl_lpuart.c:823:10:LPUART_TransferSendNonBlocking	8	static
 ../drivers/fsl_lpuart.c:853:6:LPUART_TransferAbortSend	8	static
 ../drivers/fsl_lpuart.c:863:10:LPUART_TransferGetSendCount	8	static
-../drivers/fsl_lpuart.c:878:10:LPUART_TransferReceiveNonBlocking	32	static
+../drivers/fsl_lpuart.c:878:10:LPUART_TransferReceiveNonBlocking	40	static
 ../drivers/fsl_lpuart.c:993:6:LPUART_TransferAbortReceive	8	static
 ../drivers/fsl_lpuart.c:1008:10:LPUART_TransferGetReceiveCount	8	static
 ../drivers/fsl_lpuart.c:1186:6:LPUART_TransferHandleErrorIRQ	0	static

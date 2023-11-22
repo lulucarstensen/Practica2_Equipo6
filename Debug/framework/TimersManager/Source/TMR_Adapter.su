@@ -1,3 +1,4 @@
+C:\Users\Alexis\Documents\MCUXpressoIDE_11.8.0_1165\GIT\Practica2_Equipo6\CMSIS/core_cm0plus.h:804:22:NVIC_SetPriority	16	static
 ../framework/TimersManager/Source/TMR_Adapter.c:74:6:StackTimer_Init	16	static
 ../framework/TimersManager/Source/TMR_Adapter.c:113:6:StackTimer_Enable	0	static
 ../framework/TimersManager/Source/TMR_Adapter.c:123:6:StackTimer_Disable	0	static

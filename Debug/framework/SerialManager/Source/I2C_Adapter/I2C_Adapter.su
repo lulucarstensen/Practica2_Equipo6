@@ -1,3 +1,4 @@
+C:\Users\Alexis\Documents\MCUXpressoIDE_11.8.0_1165\GIT\Practica2_Equipo6\CMSIS/core_cm0plus.h:804:22:NVIC_SetPriority	16	static
 ../framework/SerialManager/Source/I2C_Adapter/I2C_Adapter.c:278:13:I2C_ISR	16	static
 ../framework/SerialManager/Source/I2C_Adapter/I2C_Adapter.c:44:10:I2C_Initialize	32	static
 ../framework/SerialManager/Source/I2C_Adapter/I2C_Adapter.c:90:10:I2C_InstallRxCalback	0	static

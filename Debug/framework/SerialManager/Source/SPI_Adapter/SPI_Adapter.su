@@ -1,3 +1,5 @@
+C:\Users\Alexis\Documents\MCUXpressoIDE_11.8.0_1165\GIT\Practica2_Equipo6\CMSIS/core_cm0plus.h:804:22:NVIC_SetPriority	16	static
+C:\Users\Alexis\Documents\MCUXpressoIDE_11.8.0_1165\GIT\Practica2_Equipo6\drivers/fsl_dspi.h:941:24:DSPI_MasterGetFormattedCommand	0	static
 ../framework/SerialManager/Source/SPI_Adapter/SPI_Adapter.c:757:13:Spi_WriteData	0	static
 ../framework/SerialManager/Source/SPI_Adapter/SPI_Adapter.c:782:15:Spi_SlaveTransmitCompleted	0	static
 ../framework/SerialManager/Source/SPI_Adapter/SPI_Adapter.c:810:13:Spi_FillTxFifoSlave	0	static

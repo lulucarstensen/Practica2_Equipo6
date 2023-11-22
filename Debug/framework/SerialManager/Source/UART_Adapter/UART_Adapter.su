@@ -1,10 +1,11 @@
+C:\Users\Alexis\Documents\MCUXpressoIDE_11.8.0_1165\GIT\Practica2_Equipo6\CMSIS/core_cm0plus.h:804:22:NVIC_SetPriority	16	static
 ../framework/SerialManager/Source/UART_Adapter/UART_Adapter.c:751:13:LPUART_ISR	16	static
 ../framework/SerialManager/Source/UART_Adapter/UART_Adapter.c:69:10:LPUART_Initialize	32	static
 ../framework/SerialManager/Source/UART_Adapter/UART_Adapter.c:106:10:LPUART_SetBaudrate	16	static
 ../framework/SerialManager/Source/UART_Adapter/UART_Adapter.c:123:10:LPUART_SendData	24	static
 ../framework/SerialManager/Source/UART_Adapter/UART_Adapter.c:162:10:LPUART_ReceiveData	16	static
 ../framework/SerialManager/Source/UART_Adapter/UART_Adapter.c:189:11:LPUART_InstallRxCalback	8	static
-../framework/SerialManager/Source/UART_Adapter/UART_Adapter.c:207:11:LPUART_InstallTxCalback	12	static
+../framework/SerialManager/Source/UART_Adapter/UART_Adapter.c:207:11:LPUART_InstallTxCalback	8	static
 ../framework/SerialManager/Source/UART_Adapter/UART_Adapter.c:225:10:LPUART_IsTxActive	8	static
 ../framework/SerialManager/Source/UART_Adapter/UART_Adapter.c:259:10:LPUART_DisableLowPowerWakeup	16	static
 ../framework/SerialManager/Source/UART_Adapter/UART_Adapter.c:245:10:LPUART_EnableLowPowerWakeup	8	static

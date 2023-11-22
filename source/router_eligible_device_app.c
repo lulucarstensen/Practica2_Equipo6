@@ -43,6 +43,7 @@ Include Files
 #include "app_temp_sensor.h"
 #include "coap.h"
 #include "app_socket_utils.h"
+
 #if THR_ENABLE_EVENT_MONITORING
 #include "app_event_monitoring.h"
 #endif
@@ -53,6 +54,7 @@ Include Files
 #if UDP_ECHO_PROTOCOL
 #include "app_echo_udp.h"
 #endif
+#include "accel.h"
 
 /*==================================================================================================
 Private macros
@@ -91,7 +93,27 @@ Private macros
 /*==================================================================================================
 Private type definitions
 ==================================================================================================*/
+/* The TPM instance/channel used for board */
+#define BOARD_TIMER_BASEADDR TPM2
+#define BOARD_FIRST_TIMER_CHANNEL 0U
+#define BOARD_SECOND_TIMER_CHANNEL 1U
+/* Get source clock for TPM driver */
+#define BOARD_TIMER_SOURCE_CLOCK CLOCK_GetFreq(kCLOCK_Osc0ErClk)
+#define TIMER_CLOCK_MODE 1U
+/* I2C source clock */
+#define ACCEL_I2C_CLK_SRC I2C1_CLK_SRC
+#define I2C_BAUDRATE 100000U
 
+#define I2C_RELEASE_SDA_PORT PORTC
+#define I2C_RELEASE_SCL_PORT PORTC
+#define I2C_RELEASE_SDA_GPIO GPIOC
+#define I2C_RELEASE_SDA_PIN 3U
+#define I2C_RELEASE_SCL_GPIO GPIOC
+#define I2C_RELEASE_SCL_PIN 2U
+#define I2C_RELEASE_BUS_COUNT 100U
+/* Upper bound and lower bound angle values */
+#define ANGLE_UPPER_BOUND 85U
+#define ANGLE_LOWER_BOUND 5U
 /*==================================================================================================
 Private global variables declarations
 ==================================================================================================*/
@@ -137,14 +159,13 @@ static void APP_AutoStartCb(void *param);
 #endif
 
 static uint8_t gCounter = 0;
-
+static int16_t angles[3]= {0,0,0};
 
 void TimerTask(osaTaskParam_t argument);
 OSA_TASK_DEFINE(TimerTask, 4, 1, 700, FALSE);
 static tmrTimerID_t TimerCounter= gTmrInvalidTimerID_c;
 osaEventId_t          CounterEvent;
 osaTaskId_t			  TimerHandler;
-
 
 void TimerCounterTimeout()
 {
@@ -245,6 +266,7 @@ void APP_Init
     void
 )
 {
+	initAccel();
     /* Initialize pointer to application task message queue */
     mpAppThreadMsgQueue = &appThreadMsgQueue;
 
@@ -554,6 +576,8 @@ static void APP_InitCoapDemo
     coapRegCbParams_t cbParams[] =  {{APP_CoapLedCb,  (coapUriPath_t *)&gAPP_LED_URI_PATH},
                                      {APP_CoapTempCb, (coapUriPath_t *)&gAPP_TEMP_URI_PATH},
 									 {APP_CoapTeam6Cb, (coapUriPath_t *)&gAPP_TEAM6_URI_PATH},
+									 {APP_CoapAccelCb, (coapUriPath_t *)&gAPP_ACCEL_URI_PATH},
+
 #if LARGE_NETWORK
                                      {APP_CoapResetToFactoryDefaultsCb, (coapUriPath_t *)&gAPP_RESET_URI_PATH},
 #endif
@@ -1592,7 +1616,7 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 		if (gCoapPUT_c == pSession->code)
 		{
 		  shell_write("'CON' packet received 'PUT' from IP: ");
-		  shell_writeHex(&pSession->localAddr.addr8, 16);
+		  shell_writeHex(pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 
 		  shell_writeN(pData, dataLen);
@@ -1660,6 +1684,119 @@ Phase 2
 
 static void APP_CoapAccelCb (coapSessionStatus_t sessionStatus, uint8_t *pData,coapSession_t *pSession, uint32_t dataLen)
 {
+
+	static int16_t *pMySessionPayload = NULL;
+	static uint32_t pMyPayloadSize = 6;
+	coapSession_t *pMySession = NULL;
+	angles[1] = getMeasureX();
+	angles[2] = getMeasureY();
+	angles[3] = getMeasureZ();
+	pMySessionPayload = angles;
+	pMySession = COAP_OpenSession(mAppCoapInstId);
+	COAP_AddOptionToList(pMySession,COAP_URI_PATH_OPTION, APP_ACCEL_URI_PATH, SizeOfString(APP_ACCEL_URI_PATH));
+	pMySession -> autoClose = FALSE;
+
+	if (gCoapConfirmable_c == pSession->msgType)
+	{
+		if (gCoapGET_c == pSession->code)
+		{
+			shell_write("'CON' packet received 'GET' from IP: ");
+			shell_writeHex(&pSession->localAddr.addr8, 16);
+			shell_write(" Payload: ");
+
+			shell_writeN(pData, dataLen);
+
+			shell_write("\r\n");
+			pMySession -> msgType=gCoapConfirmable_c;
+			pMySession -> code= gCoapPOST_c;
+			pMySession -> pCallback =NULL;
+			FLib_MemCpy(&pMySession->remoteAddrStorage,&gCoapDestAddress,sizeof(ipAddr_t));
+
+//			COAP_Send(pMySession, gCoapNonConfirmable_c,  pMySessionPayload, pMyPayloadSize);
+
+
+		}
+		if (gCoapPOST_c == pSession->code)
+		{
+		  shell_write("'CON' packet received 'POST' from IP: ");
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
+		  shell_write(" Payload: ");
+
+		  shell_writeN(pData, dataLen);
+
+		}
+		if (gCoapPUT_c == pSession->code)
+		{
+		  shell_write("'CON' packet received 'PUT' from IP: ");
+		  shell_writeHex(pSession->localAddr.addr8, 16);
+		  shell_write(" Payload: ");
+
+		  shell_writeN(pData, dataLen);
+
+		}
+		if (gCoapFailure_c!=sessionStatus)
+		{
+			COAP_Send(pSession, gCoapMsgTypeAckSuccessChanged_c, pMySessionPayload, pMyPayloadSize);
+			shell_write("'CON' packet sent 'POST' with payload: ");
+			shell_write("X: ");
+			shell_writeHex((&pMySessionPayload), 2);
+			shell_write("Y: ");
+			shell_writeHex((&pMySessionPayload+16),2);
+			shell_write("Z: ");
+			shell_writeHex((&pMySessionPayload+32), 2);
+			shell_write("\r\n");
+			shell_write("\r\n");
+		}
+	}
+
+	else if(gCoapNonConfirmable_c == pSession->msgType)
+	{
+		if (gCoapGET_c == pSession->code)
+		{
+			shell_write("'NON' packet received 'GET' from IP: ");
+			shell_writeHex(&pSession->localAddr.addr8, 16);
+			shell_write(" Payload: ");
+
+			shell_writeN(pData, dataLen);
+
+			shell_write("\r\n");
+			pMySession -> msgType=gCoapNonConfirmable_c;
+			pMySession -> code= gCoapPOST_c;
+			pMySession -> pCallback =NULL;
+			FLib_MemCpy(&pMySession->remoteAddrStorage,&gCoapDestAddress,sizeof(ipAddr_t));
+
+			COAP_Send(pMySession, gCoapNonConfirmable_c,  pMySessionPayload, pMyPayloadSize);
+			shell_write("'NON' packet sent 'POST' with payload: ");
+			shell_write("X: ");
+			shell_writeHex(pMySessionPayload, 2);
+			shell_write("Y: ");
+			shell_writeHex(pMySessionPayload+16,2);
+			shell_write("Z: ");
+		    shell_writeHex(pMySessionPayload+32, 2);
+			shell_write("\r\n");
+
+		}
+		if (gCoapPOST_c == pSession->code)
+		{
+		  shell_write("'NON' packet received 'POST' from IP: ");
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
+		  shell_write(" Payload: ");
+
+		  shell_writeN(pData, dataLen);
+
+		}
+		if (gCoapPUT_c == pSession->code)
+		{
+		  shell_write("'NON' packet received 'PUT' from IP: ");
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
+		  shell_write(" Payload: ");
+
+		  shell_writeN(pData, dataLen);
+
+		}
+	}
+
+	COAP_CloseSession(pMySession);
 
 }
 /*==================================================================================================
