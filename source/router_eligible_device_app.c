@@ -124,7 +124,8 @@ static void APP_CoapLedCb(coapSessionStatus_t sessionStatus, uint8_t *pData, coa
 static void APP_CoapTempCb(coapSessionStatus_t sessionStatus, uint8_t *pData, coapSession_t *pSession, uint32_t dataLen);
 static void APP_CoapSinkCb(coapSessionStatus_t sessionStatus, uint8_t *pData, coapSession_t *pSession, uint32_t dataLen);
 static void APP_CoapTeam6Cb(coapSessionStatus_t sessionStatus, void *pData, coapSession_t *pSession, uint32_t dataLen);
-static void APP_CoapAccelCb(coapSessionStatus_t sessionStatus, uint8_t *pData, coapSession_t *pSession, uint32_t dataLen);
+static void APP_CoapAccelCb(coapSessionStatus_t sessionStatus, uint16_t *pData, coapSession_t *pSession, uint32_t dataLen);
+static void APP_Request ();
 
 
 static void App_RestoreLeaderLed(uint8_t *param);
@@ -143,7 +144,6 @@ static tmrTimerID_t TimerCounter= gTmrInvalidTimerID_c;
 osaEventId_t          CounterEvent;
 osaTaskId_t			  TimerHandler;
 
-void TimerTask(osaTaskParam_t argument);
 void TimerCounterTimeout()
 {
 	OSA_EventSet(CounterEvent, gTimerCounterEvent);
@@ -178,7 +178,6 @@ const coapUriPath_t gAPP_SINK_URI_PATH = {SizeOfString(APP_SINK_URI_PATH), (uint
 
 const coapUriPath_t gAPP_TEAM6_URI_PATH = {SizeOfString(APP_TEAM6_URI_PATH), (uint8_t *) APP_TEAM6_URI_PATH};
 const coapUriPath_t gAPP_ACCEL_URI_PATH = {SizeOfString(APP_ACCEL_URI_PATH), (uint8_t *) APP_ACCEL_URI_PATH};
-
 
 #if LARGE_NETWORK
 const coapUriPath_t gAPP_RESET_URI_PATH = {SizeOfString(APP_RESET_TO_FACTORY_URI_PATH), (uint8_t *)APP_RESET_TO_FACTORY_URI_PATH};
@@ -460,10 +459,12 @@ void APP_Commissioning_Handler
             break;
         case gThrEv_MeshCop_JoinerDtlsSessionStarted_c:
             App_UpdateStateLeds(gDeviceState_JoiningOrAttaching_c);
+            TimerTaskInit();
             break;
         case gThrEv_MeshCop_JoinerDtlsError_c:
         case gThrEv_MeshCop_JoinerError_c:
             App_UpdateStateLeds(gDeviceState_FactoryDefault_c);
+
             break;
         case gThrEv_MeshCop_JoinerAccepted_c:
             break;
@@ -478,7 +479,6 @@ void APP_Commissioning_Handler
 
             MESHCOP_AddExpectedJoiner(mThrInstanceId, aDefaultEui, defaultPskD.aStr, defaultPskD.length, TRUE);
             MESHCOP_SyncSteeringData(mThrInstanceId, gMeshcopEuiMaskAllFFs_c);
-        	TimerTaskInit();
             break;
         }
         case gThrEv_MeshCop_CommissionerPetitionRejected_c:
@@ -855,6 +855,7 @@ static void APP_JoinEventsHandler
         else if(evCode == gThrEv_NwkJoinCnf_Success_c)
         {
             mJoiningIsAppInitiated = FALSE;
+
         }
     }
 }
@@ -1528,7 +1529,7 @@ static void APP_AutoStartCb
 #endif
 
 
-static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coapSession_t *pSession, uint32_t dataLen)
+static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData, coapSession_t *pSession, uint32_t dataLen)
 {
 	static uint8_t pMySessionPayload[4]={'g','o','o','d'};
 	static uint32_t pMyPayloadSize = 4;
@@ -1585,19 +1586,20 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 		}
 	}
 
-	shell_writeN(pData, dataLen);
+	shell_writeHex(pData, dataLen);
 	shell_write("\r\n");
 	COAP_CloseSession(pMySession);
 
 }
 
-
-void TimerTask (osaTaskParam_t argument)
+/*==================================================================================================
+Private debug functions
+==================================================================================================*/
+void TimerTask(osaTaskParam_t argument)
 {
 	static uint8_t pMySessionPayload[4]={'g','i','v','e'};
 	static uint32_t pMyPayloadSize = 4;
 	coapSession_t *pMySession = NULL;
-	COAP_AddOptionToList(pMySession,COAP_URI_PATH_OPTION, APP_TEAM6_URI_PATH, SizeOfString(APP_TEAM6_URI_PATH));
 	osaEventFlags_t ev;
 	StartTimerCounter();
 	while(1)
@@ -1607,24 +1609,26 @@ void TimerTask (osaTaskParam_t argument)
 		if(ev == gTimerCounterEvent)
 		{
 			pMySession = COAP_OpenSession(mAppCoapInstId);
+			COAP_AddOptionToList(pMySession,COAP_URI_PATH_OPTION, APP_TEAM6_URI_PATH, SizeOfString(APP_TEAM6_URI_PATH));
 
 			pMySession -> autoClose = FALSE;
-			pMySession -> msgType=gCoapNonConfirmable_c;
+			pMySession -> msgType=gCoapConfirmable_c;
 			pMySession -> code= gCoapGET_c;
 			pMySession -> pCallback =NULL;
 			FLib_MemCpy(&pMySession->remoteAddrStorage,&gCoapDestAddress,sizeof(ipAddr_t));
 
 			COAP_Send(pMySession, pMySession -> msgType,  pMySessionPayload, pMyPayloadSize);
-			shell_write("'NON' packet sent 'POST' with payload: ");
+			shell_write("'NON' packet sent 'GET' with payload: ");
 			shell_writeN((char*) pMySessionPayload, pMyPayloadSize);
 			shell_write("\r\n");
 			COAP_CloseSession(pMySession);
-
+			APP_Request ();
 		}
 
 	}
 
 }
+
 
 static void APP_Request ()
 {
@@ -1648,18 +1652,19 @@ static void APP_Request ()
 	COAP_CloseSession(pMySession);
 }
 
-static void APP_CoapAccelCb (coapSessionStatus_t sessionStatus, uint8_t *pData,coapSession_t *pSession, uint32_t dataLen)
+
+static void APP_CoapAccelCb (coapSessionStatus_t sessionStatus, uint16_t *pData,coapSession_t *pSession, uint32_t dataLen)
 {
 	static uint8_t pMySessionPayload[6]={'t','h','a','n','k','s'};
 	static uint32_t pMyPayloadSize = 6;
 	coapSession_t *pMySession = NULL;
 	pMySession = COAP_OpenSession(mAppCoapInstId);
 	COAP_AddOptionToList(pMySession,COAP_URI_PATH_OPTION, APP_ACCEL_URI_PATH, SizeOfString(APP_ACCEL_URI_PATH));
-	uint8_t *x, *y, *z;
+	uint16_t *x, *y, *z;
 
-	*x = &pData;
-	*y = &pData + 8;
-	*z = &pData + 16;
+	x = pData;
+	y = pData + 16;
+	z = pData + 32;
 
 	if (gCoapConfirmable_c == pSession->msgType)
 	{
@@ -1674,11 +1679,11 @@ static void APP_CoapAccelCb (coapSessionStatus_t sessionStatus, uint8_t *pData,c
 		  shell_write("'CON' packet received 'POST' from IP: ");
 		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" X: ");
-		  shell_writeHex(x,1);
+		  shell_writeHex(x,2);
 		  shell_write(" Y: ");
-		  shell_writeHex(y,1);
+		  shell_writeHex(y,2);
 		  shell_write(" Z: ");
-		  shell_writeHex(z,1);
+		  shell_writeHex(z,2);
 		}
 		if (gCoapPUT_c == pSession->code)
 		{
@@ -1705,11 +1710,11 @@ static void APP_CoapAccelCb (coapSessionStatus_t sessionStatus, uint8_t *pData,c
 		  shell_write("'NON' packet received 'POST' from IP: ");
 		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" X: ");
-		  shell_writeHex(x,1);
+		  shell_writeHex(x,2);
 		  shell_write(" Y: ");
-		  shell_writeHex(y,1);
+		  shell_writeHex(y,2);
 		  shell_write(" Z: ");
-		  shell_writeHex(z,1);
+		  shell_writeHex(z,2);
 		}
 		if (gCoapPUT_c == pSession->code)
 		{
@@ -1724,9 +1729,4 @@ static void APP_CoapAccelCb (coapSessionStatus_t sessionStatus, uint8_t *pData,c
 	COAP_CloseSession(pMySession);
 
 }
-
-
-/*==================================================================================================
-Private debug functions
-==================================================================================================*/
 

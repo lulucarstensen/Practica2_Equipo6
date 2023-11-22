@@ -142,7 +142,7 @@ Public macros
 /*! The PAN identifier.
    If this value is 0xFFFF a random PAN ID will be generated on network creation */
 #ifndef THR_PAN_ID
-    #define THR_PAN_ID                                  THR_ALL_FFs16
+    #define THR_PAN_ID                                  0x6666
 #endif
 
 /*! The extended Pan ID.
@@ -200,7 +200,7 @@ Public macros
 
 /*! The default network name */
 #ifndef THR_NETWORK_NAME
-    #define THR_NETWORK_NAME                           {5, "TEAM6"}
+    #define THR_NETWORK_NAME                           {14, "Kinetis_Thread"}
 #endif
 
 /*! The default vendor name */
