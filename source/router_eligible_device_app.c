@@ -80,6 +80,7 @@ Private macros
 #define APP_TEMP_URI_PATH                       "/temp"
 #define APP_SINK_URI_PATH                       "/sink"
 #define APP_TEAM6_URI_PATH                      "/team6"
+#define APP_ACCEL_URI_PATH                      "/accel"
 #if LARGE_NETWORK
 #define APP_RESET_TO_FACTORY_URI_PATH           "/reset"
 #endif
@@ -123,6 +124,7 @@ static void APP_CoapLedCb(coapSessionStatus_t sessionStatus, uint8_t *pData, coa
 static void APP_CoapTempCb(coapSessionStatus_t sessionStatus, uint8_t *pData, coapSession_t *pSession, uint32_t dataLen);
 static void APP_CoapSinkCb(coapSessionStatus_t sessionStatus, uint8_t *pData, coapSession_t *pSession, uint32_t dataLen);
 static void APP_CoapTeam6Cb(coapSessionStatus_t sessionStatus, void *pData, coapSession_t *pSession, uint32_t dataLen);
+static void APP_CoapAccelCb(coapSessionStatus_t sessionStatus, uint8_t *pData, coapSession_t *pSession, uint32_t dataLen);
 
 static void App_RestoreLeaderLed(uint8_t *param);
 #if LARGE_NETWORK
@@ -196,6 +198,7 @@ const coapUriPath_t gAPP_TEMP_URI_PATH = {SizeOfString(APP_TEMP_URI_PATH), (uint
 const coapUriPath_t gAPP_SINK_URI_PATH = {SizeOfString(APP_SINK_URI_PATH), (uint8_t *)APP_SINK_URI_PATH};
 
 const coapUriPath_t gAPP_TEAM6_URI_PATH = {SizeOfString(APP_TEAM6_URI_PATH), (uint8_t *) APP_TEAM6_URI_PATH};
+const coapUriPath_t gAPP_ACCEL_URI_PATH = {SizeOfString(APP_ACCEL_URI_PATH), (uint8_t *) APP_ACCEL_URI_PATH};
 
 
 #if LARGE_NETWORK
@@ -1544,6 +1547,9 @@ static void APP_AutoStartCb
 }
 #endif
 
+/*==================================================================================================
+Phase 1
+==================================================================================================*/
 
 static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coapSession_t *pSession, uint32_t dataLen)
 {
@@ -1647,6 +1653,15 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 
 }
 
+/*==================================================================================================
+Phase 2
+==================================================================================================*/
+
+
+static void APP_CoapAccelCb (coapSessionStatus_t sessionStatus, uint8_t *pData,coapSession_t *pSession, uint32_t dataLen)
+{
+
+}
 /*==================================================================================================
 Private debug functions
 ==================================================================================================*/
