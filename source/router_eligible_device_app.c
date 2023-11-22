@@ -1541,20 +1541,20 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 		if (gCoapGET_c == pSession->code)
 		{
 		  shell_write("'CON' packet received 'GET' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 
 		}
 		if (gCoapPOST_c == pSession->code)
 		{
 		  shell_write("'CON' packet received 'POST' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 		}
 		if (gCoapPUT_c == pSession->code)
 		{
 		  shell_write("'CON' packet received 'PUT' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 		}
 		if (gCoapFailure_c!=sessionStatus)
@@ -1568,19 +1568,19 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 		if (gCoapGET_c == pSession->code)
 		{
 		  shell_write("'NON' packet received 'GET' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 		}
 		if (gCoapPOST_c == pSession->code)
 		{
 		  shell_write("'NON' packet received 'POST' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 		}
 		if (gCoapPUT_c == pSession->code)
 		{
 		  shell_write("'NON' packet received 'PUT' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 		}
 	}
@@ -1646,7 +1646,6 @@ static void APP_Request ()
 	shell_writeN((char*) pMySessionPayload, pMyPayloadSize);
 	shell_write("\r\n");
 	COAP_CloseSession(pMySession);
-
 }
 
 static void APP_CoapAccelCb (coapSessionStatus_t sessionStatus, uint8_t *pData,coapSession_t *pSession, uint32_t dataLen)
@@ -1656,26 +1655,35 @@ static void APP_CoapAccelCb (coapSessionStatus_t sessionStatus, uint8_t *pData,c
 	coapSession_t *pMySession = NULL;
 	pMySession = COAP_OpenSession(mAppCoapInstId);
 	COAP_AddOptionToList(pMySession,COAP_URI_PATH_OPTION, APP_ACCEL_URI_PATH, SizeOfString(APP_ACCEL_URI_PATH));
+	uint8_t *x, *y, *z;
+
+	*x = &pData;
+	*y = &pData + 8;
+	*z = &pData + 16;
 
 	if (gCoapConfirmable_c == pSession->msgType)
 	{
 		if (gCoapGET_c == pSession->code)
 		{
 		  shell_write("'CON' packet received 'GET' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
-
 		}
 		if (gCoapPOST_c == pSession->code)
 		{
 		  shell_write("'CON' packet received 'POST' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
-		  shell_write(" Payload: ");
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
+		  shell_write(" X: ");
+		  shell_writeHex(x,1);
+		  shell_write(" Y: ");
+		  shell_writeHex(y,1);
+		  shell_write(" Z: ");
+		  shell_writeHex(z,1);
 		}
 		if (gCoapPUT_c == pSession->code)
 		{
 		  shell_write("'CON' packet received 'PUT' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 		}
 		if (gCoapFailure_c!=sessionStatus)
@@ -1689,19 +1697,24 @@ static void APP_CoapAccelCb (coapSessionStatus_t sessionStatus, uint8_t *pData,c
 		if (gCoapGET_c == pSession->code)
 		{
 		  shell_write("'NON' packet received 'GET' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 		}
 		if (gCoapPOST_c == pSession->code)
 		{
 		  shell_write("'NON' packet received 'POST' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
-		  shell_write(" Payload: ");
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
+		  shell_write(" X: ");
+		  shell_writeHex(x,1);
+		  shell_write(" Y: ");
+		  shell_writeHex(y,1);
+		  shell_write(" Z: ");
+		  shell_writeHex(z,1);
 		}
 		if (gCoapPUT_c == pSession->code)
 		{
 		  shell_write("'NON' packet received 'PUT' from IP: ");
-		  shell_writeN((char *)pSession->localAddr.addr64, 128);
+		  shell_writeHex(&pSession->localAddr.addr8, 16);
 		  shell_write(" Payload: ");
 		}
 	}
