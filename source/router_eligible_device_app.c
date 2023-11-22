@@ -1595,7 +1595,7 @@ static void APP_CoapTeam6Cb (coapSessionStatus_t sessionStatus, void *pData,coap
 			shell_writeN(pData, dataLen);
 
 			shell_write("\r\n");
-//			pMySession -> msgType=gCoapNonConfirmable_c;
+			pMySession -> msgType=gCoapConfirmable_c;
 			pMySession -> code= gCoapPOST_c;
 			pMySession -> pCallback =NULL;
 			FLib_MemCpy(&pMySession->remoteAddrStorage,&gCoapDestAddress,sizeof(ipAddr_t));
@@ -1685,13 +1685,12 @@ Phase 2
 static void APP_CoapAccelCb (coapSessionStatus_t sessionStatus, uint8_t *pData,coapSession_t *pSession, uint32_t dataLen)
 {
 
-	static int16_t *pMySessionPayload = NULL;
+	static int16_t pMySessionPayload[3] = {0,0,0};
 	static uint32_t pMyPayloadSize = 6;
 	coapSession_t *pMySession = NULL;
-	angles[1] = getMeasureX();
-	angles[2] = getMeasureY();
-	angles[3] = getMeasureZ();
-	pMySessionPayload = angles;
+	pMySessionPayload[1] = getMeasureX();
+	pMySessionPayload[2] = getMeasureY();
+	pMySessionPayload[3] = getMeasureZ();
 	pMySession = COAP_OpenSession(mAppCoapInstId);
 	COAP_AddOptionToList(pMySession,COAP_URI_PATH_OPTION, APP_ACCEL_URI_PATH, SizeOfString(APP_ACCEL_URI_PATH));
 	pMySession -> autoClose = FALSE;
@@ -1739,12 +1738,11 @@ static void APP_CoapAccelCb (coapSessionStatus_t sessionStatus, uint8_t *pData,c
 			COAP_Send(pSession, gCoapMsgTypeAckSuccessChanged_c, pMySessionPayload, pMyPayloadSize);
 			shell_write("'CON' packet sent 'POST' with payload: ");
 			shell_write("X: ");
-			shell_writeHex((&pMySessionPayload), 2);
+			shell_writeHex((uint8_t*)(pMySessionPayload), 2);
 			shell_write("Y: ");
-			shell_writeHex((&pMySessionPayload+16),2);
+			shell_writeHex((uint8_t*)(pMySessionPayload+16), 2);
 			shell_write("Z: ");
-			shell_writeHex((&pMySessionPayload+32), 2);
-			shell_write("\r\n");
+			shell_writeHex((uint8_t*)(pMySessionPayload+32), 2);
 			shell_write("\r\n");
 		}
 	}
@@ -1768,11 +1766,11 @@ static void APP_CoapAccelCb (coapSessionStatus_t sessionStatus, uint8_t *pData,c
 			COAP_Send(pMySession, gCoapNonConfirmable_c,  pMySessionPayload, pMyPayloadSize);
 			shell_write("'NON' packet sent 'POST' with payload: ");
 			shell_write("X: ");
-			shell_writeHex(pMySessionPayload, 2);
+			shell_writeHex((uint8_t*)(pMySessionPayload), 2);
 			shell_write("Y: ");
-			shell_writeHex(pMySessionPayload+16,2);
+			shell_writeHex((uint8_t*)(pMySessionPayload+16), 2);
 			shell_write("Z: ");
-		    shell_writeHex(pMySessionPayload+32, 2);
+			shell_writeHex((uint8_t*)(pMySessionPayload+32), 2);
 			shell_write("\r\n");
 
 		}
